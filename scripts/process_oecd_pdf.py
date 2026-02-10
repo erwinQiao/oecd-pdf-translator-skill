@@ -29,7 +29,8 @@ def run_command(cmd: list, description: str) -> bool:
 
 
 def process_oecd_pdf(pdf_path: str, output_dir: str = None,
-                    title: str = None, doc_number: str = None) -> None:
+                    title: str = None, doc_number: str = None,
+                    template_path: str = None, publication_date: str = None) -> None:
     """
     Complete workflow to process OECD PDF to Chinese QMD.
 
@@ -38,6 +39,8 @@ def process_oecd_pdf(pdf_path: str, output_dir: str = None,
         output_dir: Output directory (default: current directory)
         title: Document title (extracted from PDF if not provided)
         doc_number: Document number (extracted from PDF if not provided)
+        template_path: Path to custom QMD template file (optional)
+        publication_date: Original publication date (optional)
     """
     pdf_path = Path(pdf_path).resolve()
 
@@ -101,14 +104,20 @@ def process_oecd_pdf(pdf_path: str, output_dir: str = None,
         sys.exit(1)
 
     # Step 3: Convert to QMD (English)
-    success = run_command([
+    cmd = [
         sys.executable,
         str(scripts_dir / "md_to_qmd.py"),
         str(extracted_md),
         str(english_qmd),
         title,
-        doc_number
-    ], "3. Convert markdown to English QMD")
+        doc_number,
+    ]
+    if template_path:
+        cmd.append(str(template_path))
+    if publication_date:
+        cmd.append(publication_date)
+
+    success = run_command(cmd, "3. Convert markdown to English QMD")
 
     if not success:
         print("❌ Failed to convert to QMD")
@@ -175,10 +184,11 @@ def process_oecd_pdf(pdf_path: str, output_dir: str = None,
 def main():
     """Main entry point."""
     if len(sys.argv) < 2:
-        print("Usage: python process_oecd_pdf.py <pdf_path> [output_dir] [title] [doc_number]")
-        print("\nExample:")
+        print("Usage: python process_oecd_pdf.py <pdf_path> [output_dir] [title] [doc_number] [template_path] [publication_date]")
+        print("\nExamples:")
         print("  python process_oecd_pdf.py 9789264071162-en.pdf")
         print("  python process_oecd_pdf.py OECD_432.pdf ./output \"In Vitro 3T3 NRU Phototoxicity Test\" 432")
+        print("  python process_oecd_pdf.py input.pdf output \"Title\" \"432\" \"../custom.qmd\" \"18 June 2019\"")
         print("\nTranslation Methods:")
         print("  Set CLAUDE_CODE_TRANSLATION environment variable:")
         print("  - claude-code: Creates translation request for Claude Code (default)")
@@ -194,8 +204,10 @@ def main():
     output_dir = sys.argv[2] if len(sys.argv) >= 3 else None
     title = sys.argv[3] if len(sys.argv) >= 4 else None
     doc_number = sys.argv[4] if len(sys.argv) >= 5 else None
+    template_path = sys.argv[5] if len(sys.argv) >= 6 else None
+    publication_date = sys.argv[6] if len(sys.argv) >= 7 else None
 
-    process_oecd_pdf(pdf_path, output_dir, title, doc_number)
+    process_oecd_pdf(pdf_path, output_dir, title, doc_number, template_path, publication_date)
 
 
 if __name__ == "__main__":

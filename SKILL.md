@@ -37,6 +37,9 @@ python scripts/process_oecd_pdf.py 9789264071162-en.pdf
 
 # With custom settings
 python scripts/process_oecd_pdf.py input.pdf ./output "Test Title" "432"
+
+# With custom template and publication date
+python scripts/process_oecd_pdf.py input.pdf ./output "Title" "432" "custom_template.qmd" "18 June 2019"
 ```
 
 ### Step-by-Step Process
@@ -159,7 +162,17 @@ Documentation and reference materials:
 
 ### assets/
 
-This skill does not include assets. All output is generated dynamically from input PDFs.
+Templates and configuration files:
+
+- **`template.qmd`** - Default QMD template with placeholders:
+  - `{{DOC_NUMBER}}` - Document number (e.g., "432")
+  - `{{TITLE}}` - Document title
+  - `{{DATE}}` - Current date (YYYY-MM-DD)
+  - `{{PUBLICATION_DATE}}` - Original publication date from PDF
+  - `{{CONTENT}}` - Main document content
+  - `{{REFERENCES}}` - References section
+
+**Usage:** Copy and customize this template for specific document types, then specify with `--template` parameter.
 
 ## Terminology Translation
 
@@ -245,6 +258,15 @@ python scripts/process_oecd_pdf.py \
     ./output \
     "In Vitro 3T3 NRU Phototoxicity Test" \
     "432"
+
+# With custom template and publication date
+python scripts/process_oecd_pdf.py \
+    OECD_432.pdf \
+    ./output \
+    "In Vitro 3T3 NRU Phototoxicity Test" \
+    "432" \
+    ./custom_template.qmd \
+    "18 June 2019"
 ```
 
 ### Individual Steps
@@ -256,8 +278,9 @@ python scripts/extract_pdf_text.py input.pdf extracted.md
 # Step 2: Extract images and tables
 python scripts/extract_pdf_images.py input.pdf images/
 
-# Step 3: Convert to QMD
+# Step 3: Convert to QMD (with template)
 python scripts/md_to_qmd.py extracted.md english.qmd "Title" "432"
+python scripts/md_to_qmd.py extracted.md english.qmd "Title" "432" "custom.qmd" "18 June 2019"
 
 # Step 4: Translate
 python scripts/translate_qmd.py english.qmd chinese.qmd claude
@@ -375,3 +398,78 @@ $$\text{PIF} = \frac{IC_{50}(-\text{Irr})}{IC_{50}(+\text{Irr})}$$
 ```
 
 This renders properly in Quarto/PDF output with formatted mathematical notation.
+
+## Template Customization
+
+The skill uses a template-based approach for generating QMD files, making it easy to customize output format.
+
+### Default Template
+
+The default template is located at `assets/template.qmd` and includes:
+
+```yaml
+---
+title: "OECD测试指南第{{DOC_NUMBER}}号：{{TITLE}}"
+subtitle: "{{TITLE}}"
+author: "OECD (经济合作与发展组织)"
+date: "{{DATE}}"
+description: "OECD化学品测试指南 - {{TITLE}}"
+keywords: [OECD, 测试指南, 毒理学, 体外测试]
+lang: zh-CN
+format:
+  html:
+    toc: true
+    number-sections: true
+    theme: flatly
+  pdf:
+    toc: true
+    number-sections: true
+  docx:
+    toc: true
+    number-sections: true
+---
+```
+
+### Template Variables
+
+The following placeholders are automatically filled:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{DOC_NUMBER}}` | OECD guideline number | `432` |
+| `{{TITLE}}` | Document title | `In Vitro 3T3 NRU Phototoxicity Test` |
+| `{{DATE}}` | Current date | `2026-02-10` |
+| `{{PUBLICATION_DATE}}` | Original publication date | `18 June 2019` |
+| `{{CONTENT}}` | Main document content | (extracted text) |
+| `{{REFERENCES}}` | References section | (literature list) |
+
+### Creating Custom Templates
+
+1. Copy the default template:
+   ```bash
+   cp assets/template.qmd my_template.qmd
+   ```
+
+2. Edit the template as needed:
+   ```yaml
+   ---
+   title: "{{TITLE}} - My Custom Format"
+   format:
+     html:
+       theme: cosmo
+       code-fold: true
+   ---
+   ```
+
+3. Use the custom template:
+   ```bash
+   python scripts/process_oecd_pdf.py input.pdf output "Title" "432" my_template.qmd
+   ```
+
+### Template Tips
+
+- Keep all `{{VARIABLE}}` placeholders intact
+- You can add custom YAML frontmatter fields
+- Modify HTML/PDF/DOCX format options as needed
+- Add custom sections before or after `{{CONTENT}}`
+- Use Quarto documentation for advanced formatting options

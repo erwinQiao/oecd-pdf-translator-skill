@@ -1,0 +1,44 @@
+---
+title: "OECD测试指南第{{DOC_NUMBER}}号：{{TITLE}}"
+subtitle: "{{TITLE}}"
+author: "OECD (经济合作与发展组织)"
+date: "{{DATE}}"
+description: "OECD化学品测试指南 - {{TITLE}}"
+keywords: [OECD, 测试指南, 毒理学, 体外测试]
+lang: zh-CN
+format:
+  html:
+    toc: true
+    number-sections: true
+    theme: flatly
+  pdf:
+    toc: true
+    number-sections: true
+  docx:
+    toc: true
+    number-sections: true
+---
+
+# 文档信息
+
+| 属性 | 内容 |
+|------|------|
+| **指南编号** | 第{{DOC_NUMBER}}号 |
+| **发布日期** | {{PUBLICATION_DATE}} |
+| **文档类型** | OECD测试指南 |
+| **主题** | {{TITLE}} |
+| **章节** | 第4节 - 健康效应 |
+
+---
+
+# 原文内容
+
+{{CONTENT}}
+
+---
+
+## 参考文献
+
+{{REFERENCES}}
+
+---
