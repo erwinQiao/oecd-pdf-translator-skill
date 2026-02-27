@@ -20,6 +20,8 @@
 
 ### Claude Code Skills 目录位置
 
+[Claude Code安装](https://www.beautyhubcode.com/docs/CodeandData/AI/claudecodeinstall.html)可以参考该方法进行国产大模型的替换
+
 Claude Code 的 skills 目录位置：
 - **Linux/macOS**: `~/.config/claude-code/skills/`
 - **Windows**: `%APPDATA%\claude-code\skills\`
